@@ -19,7 +19,41 @@ async function finalizeLottery() {
 
   try {
 		await client.connect();
-		// TODO: Implement me
+    //const lottery = await client.hGetAll(`lottery.${lotteryId}`);
+    const lottery = await client.hExists(
+        `lottery.${lotteryId}`,
+        "status"
+      );
+    if (!lottery) {
+        console.log("Lottery not found");
+        return;
+        }
+    const status = lottery.status;
+    if (status === "finalized") {
+        console.log("Lottery already finalized");
+        return;
+    }
+    const participants = await client.lRange(
+        `lottery.${lotteryId}.participants`,
+        0,
+        -1
+      );
+  
+      if (!participants.length) {
+        throw new Error("A lottery with the given ID has no participants");
+      }
+  
+      const winner = random.choice(participants);
+  
+      await client
+        .multi()
+        .hSet(`lottery.${lotteryId}`, "winner", winner)
+        .hSet(`lottery.${lotteryId}`, "status", "finished")
+        .exec();
+  
+      console.log("Successfully finalized the lottery!");
+      console.log("Participants:", participants);
+      console.log("The lucky winner:", winner);
 
   } catch (e) {
     console.log("Error finalizing the lottery:", e.message);
