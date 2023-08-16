@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const port = 3000;
+const { REDIS_URL } = process.env;
 
 app.use(express.json({ limit: "10kb" }));
 
