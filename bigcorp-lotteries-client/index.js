@@ -1,0 +1,1 @@
+.jsconsole.log("It works!");
