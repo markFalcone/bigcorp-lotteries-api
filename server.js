@@ -1,6 +1,7 @@
 const express = require("express");
 const redis = require("redis");
 const ulid = require("ulid");
+const cors = require("cors"); // Remember to import the package!
 
 // Redis setup
 
@@ -16,6 +17,12 @@ client.on("error", (error) => {
 const app = express();
 const port = 3000;
 app.use(express.json({ limit: "10kb" }));
+
+if (process.env.NODE_ENV === "development") {
+  // Enabling Cross-Origin Resource Sharing in development, as we run
+  // the frontend and the backend code on different ports while developing.
+  app.use(cors());
+}
 
 // API routes
 app.get("/lotteries", async (req, res) => {
