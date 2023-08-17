@@ -59,9 +59,32 @@ function updateLottery(lottery) {
     updateExistingLottery(lottery);
   }
 }
-
 export async function updateLotteries() {
-  // TODO: Obtain the lottery data from the GET /lotteries endpoint.
-  // 1. Use the `fetch` API to make the request.
-  // 2. Update each lottery using the `updateLottery` function above.
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/lotteries`);
+    const lotteries = await response.json();
+    console.log("New lottery data:", lotteries);
+
+    lotteries.forEach((lottery) => updateLottery(lottery));
+  } catch (e) {
+    console.error("Error updating lotteries:", e.message);
+  }
 }
+
+// export async function updateLotteries() {
+//   // TODO: Obtain the lottery data from the GET /lotteries endpoint.
+//   // 1. Use the `fetch` API to make the request.
+//   // 2. Update each lottery using the `updateLottery` function above.
+//   try{
+//     //const response = await fetch("http://localhost:3000/lotteries");
+//     const response = await fetch("http://localhost:5173/lotteries");
+
+//     const lotteries = await response.json();
+//     // log the lotteries
+//     console.log("lotteries are: ", lotteries);
+//     lotteries.forEach(lottery => updateLottery(lottery));
+
+//   }catch(err){
+//     console.error("Error updating lotteries error is: ", err);
+//   }
+// }
