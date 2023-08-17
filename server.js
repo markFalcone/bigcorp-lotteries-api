@@ -141,12 +141,10 @@ app.post("/lotteries", async (req, res) => {
   }
 });
 
-
-
-
-
-
-
+if (process.env.NODE_ENV === "production") {
+  // Serving the bundled frontend code together with the backend on the same port in production.
+  app.use(express.static("<your_frontend_folder>/dist"));
+}
 
 // Server start
 
