@@ -4,22 +4,24 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "dev": "node -r dotenv/config server.js",
-    "finalize-lottery": "node -r dotenv/config scripts/finalizeLottery.mjs",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build-client": "cd client && npm run build",
-    "prod": "npm run build-client && NODE_ENV=production node -r dotenv/config server.js"
+    "dev": "NODE_ENV=development node -r dotenv/config server.js",
+    "prod": "npm run build-client && NODE_ENV=production node -r dotenv/config server.js",
+    "finalize-lottery": "node -r dotenv/config scripts/finalizeLottery.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "MARKFALCONE",
+  "author": "",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2",
+    "random": "^4.1.0",
     "redis": "^4.6.7",
     "ulid": "^2.3.0"
   },
   "devDependencies": {
+    "@types/node": "^20.5.9",
     "dotenv": "^16.1.4",
-    "random": "^4.1.0"
+    "typescript": "^5.2.2"
   }
 }

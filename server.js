@@ -1,7 +1,7 @@
 const express = require("express");
+const cors = require("cors");
 const redis = require("redis");
 const ulid = require("ulid");
-const cors = require("cors"); // Remember to import the package!
 
 // Redis setup
 
@@ -25,6 +25,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // API routes
+
 app.get("/lotteries", async (req, res) => {
   try {
     const lotteryIds = await client.lRange("lotteries", 0, -1);
@@ -37,66 +38,6 @@ app.get("/lotteries", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to read the lotteries data" });
-  }
-});
-
-app.post("/lotteries", async (req, res) => {
-  const { type, name, prize } = req.body;
-
-  if (type !== "simple") {
-    res.status(422).json({ error: "Invalid lottery type" });
-    return;
-  }
-
-  if (typeof name !== "string" || name.length < 3) {
-    res.status(422).json({ error: "Invalid lottery name" });
-    return;
-  }
-
-  if (typeof prize !== "string" || prize.length < 3) {
-    res.status(422).json({ error: "Invalid lottery prize" });
-    return;
-  }
-
-  const id = ulid.ulid();
-  const newLottery = { // Create a new lottery object
-    id,
-    name,
-    prize,
-    type,
-    status: "running",
-  };
-
-  try {
-    await client
-      .multi() // multi() starts a transaction
-      .hSet(`lottery.${id}`, newLottery) // hSet() sets a hash field they key is lottery.id and the value is the newLottery object
-      .lPush("lotteries", id) // lPush() pushes an element to a list
-      .exec(); // exec() executes the transaction
-    res.json(newLottery); // Send the new lottery as the response.
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to create the lottery" });
-  }
-});
-
-app.get("/lottery/:id", async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const lottery = await client.hGetAll(`lottery.${id}`); // hGetAll() gets all the fields and values of a hash
-
-    if (!Object.keys(lottery).length) { // If the lottery object is empty, it means that the lottery with the given ID does not exist.
-      res
-        .status(404)
-        .json({ error: "A lottery with the given ID does not exist" });
-      return;
-    }
-
-    res.json(lottery);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to read the lottery data" });
   }
 });
 
@@ -141,9 +82,64 @@ app.post("/lotteries", async (req, res) => {
   }
 });
 
+app.get("/lottery/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const lottery = await client.hGetAll(`lottery.${id}`);
+
+    if (!Object.keys(lottery).length) {
+      res
+        .status(404)
+        .json({ error: "A lottery with the given ID does not exist" });
+      return;
+    }
+
+    res.json(lottery);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to read the lottery data" });
+  }
+});
+
+app.post("/register", async (req, res) => {
+  const { lotteryId, name } = req.body;
+
+  if (!lotteryId) {
+    res.status(400).json({ error: "Lottery ID must be provided" });
+    return;
+  }
+
+  if (!name) {
+    res.status(400).json({ error: "Participant's name must be provided" });
+    return;
+  }
+
+  try {
+    const lotteryStatus = await client.hGet(`lottery.${lotteryId}`, "status");
+
+    if (!lotteryStatus) {
+      throw new Error("A lottery with the given ID doesn't exist");
+    }
+
+    if (lotteryStatus === "finished") {
+      throw new Error("A lottery with the given ID is already finished");
+    }
+
+    await client.lPush(`lottery.${lotteryId}.participants`, name);
+
+    res.json({ status: "Success" });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: `Failed to register for the lottery: ${error.message}` });
+  }
+});
+
 if (process.env.NODE_ENV === "production") {
   // Serving the bundled frontend code together with the backend on the same port in production.
-  app.use(express.static("<your_frontend_folder>/dist"));
+  app.use(express.static("client/dist"));
 }
 
 // Server start
