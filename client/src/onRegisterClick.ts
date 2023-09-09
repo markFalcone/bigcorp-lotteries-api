@@ -1,7 +1,9 @@
 export async function onRegisterClick(): Promise<void> {
-  const nameInput = document.getElementById("name") as HTMLInputElement;
+  const nameInput = document.getElementById('name') as HTMLInputElement;
   const checkboxes = Array.from(
-    document.querySelectorAll("input[type=checkbox]") as NodeListOf<HTMLInputElement>
+    document.querySelectorAll(
+      'input[type=checkbox]',
+    ) as NodeListOf<HTMLInputElement>,
   );
 
   if (!nameInput) {
@@ -19,22 +21,22 @@ export async function onRegisterClick(): Promise<void> {
           .map((checkbox) =>
             fetch(`${import.meta.env.VITE_API_URL}/register`, {
               headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
               },
-              method: "POST",
+              method: 'POST',
               body: JSON.stringify({
                 lotteryId: checkbox.id,
                 name: currName,
               }),
-            })
-          )
+            }),
+          ),
       );
 
-      nameInput.value = "";
+      nameInput.value = '';
       alert(`Successfully registered ${currName} for the selected lotteries!`);
     } catch (e) {
-      console.error("Error registering for lotteries");
+      console.error('Error registering for lotteries');
     }
   }
 }

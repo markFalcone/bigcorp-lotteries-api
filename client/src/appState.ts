@@ -1,4 +1,3 @@
-
 import { Lottery } from '../../types';
 
 interface AppState {

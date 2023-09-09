@@ -1,16 +1,16 @@
-import { appState } from "./appState";
-import { Lottery } from "../../types";
+import { Lottery } from '../../types';
+import { appState } from './appState';
 
 function createRow(name: string, value: string): HTMLDivElement {
-  const div = document.createElement("div");
+  const div = document.createElement('div');
   div.textContent = `${name}: ${value}`;
   return div;
 }
 
 function getLotteryHtml(lottery: Lottery): HTMLDivElement {
-  const lotteryContainer = document.createElement("div");
+  const lotteryContainer = document.createElement('div');
   lotteryContainer.id = `container-${lottery.id}`;
-  lotteryContainer.className = "lottery";
+  lotteryContainer.className = 'lottery';
 
   const rows = Object.entries(lottery)
     .sort()
@@ -18,10 +18,10 @@ function getLotteryHtml(lottery: Lottery): HTMLDivElement {
 
   lotteryContainer.append(...rows);
 
-  if (lottery.status === "running") {
-    const checkbox = document.createElement("input");
+  if (lottery.status === 'running') {
+    const checkbox = document.createElement('input');
     checkbox.id = lottery.id;
-    checkbox.type = "checkbox";
+    checkbox.type = 'checkbox';
     lotteryContainer.appendChild(checkbox);
   }
 
@@ -31,10 +31,11 @@ function getLotteryHtml(lottery: Lottery): HTMLDivElement {
 function addNewLottery(lottery: Lottery): void {
   appState.lotteries.set(lottery.id, lottery);
 
-  const lotteriesContainer: HTMLElement | null = document.getElementById("lotteries");
+  const lotteriesContainer: HTMLElement | null =
+    document.getElementById('lotteries');
   const lotteryHtml = getLotteryHtml(lottery);
 
-  if(lotteriesContainer) {
+  if (lotteriesContainer) {
     lotteriesContainer.appendChild(lotteryHtml);
   }
 }
@@ -49,13 +50,15 @@ function updateExistingLottery(lottery: Lottery): void {
   if (currentData !== newData) {
     appState.lotteries.set(lottery.id, lottery);
 
-    const lotteryContainer: HTMLElement | null = document.getElementById(`container-${lottery.id}`);
+    const lotteryContainer: HTMLElement | null = document.getElementById(
+      `container-${lottery.id}`,
+    );
 
-    if(!lotteryContainer) {
-      return
+    if (!lotteryContainer) {
+      return;
     }
 
-    lotteryContainer.innerHTML = "";
+    lotteryContainer.innerHTML = '';
     const lotteryHtml = getLotteryHtml(lottery);
     lotteryContainer.appendChild(lotteryHtml);
   }
@@ -69,18 +72,18 @@ function updateLottery(lottery: Lottery): void {
   }
 }
 
-export async function updateLotteries() : Promise<void>{
+export async function updateLotteries(): Promise<void> {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/lotteries`);
     const lotteries = await response.json();
-    console.log("New lottery data:", lotteries);
+    console.log('New lottery data:', lotteries);
 
     lotteries.forEach((lottery: Lottery) => updateLottery(lottery));
   } catch (e) {
-  // Because JavaScript allows throwing any value, TypeScript
-  // does not support declaring the type of an error
+    // Because JavaScript allows throwing any value, TypeScript
+    // does not support declaring the type of an error
     if (e instanceof Error) {
-      console.error("Error updating lotteries:", e.message);
+      console.error('Error updating lotteries:', e.message);
     }
   }
 }
