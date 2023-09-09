@@ -1,8 +1,12 @@
-export async function onRegisterClick() {
-  const nameInput = document.getElementById("name");
+export async function onRegisterClick(): Promise<void> {
+  const nameInput = document.getElementById("name") as HTMLInputElement;
   const checkboxes = Array.from(
-    document.querySelectorAll("input[type=checkbox]")
+    document.querySelectorAll("input[type=checkbox]") as NodeListOf<HTMLInputElement>
   );
+
+  if (!nameInput) {
+    return;
+  }
 
   const currName = nameInput.value;
   const isAnyChecked = checkboxes.some((checkbox) => checkbox.checked);
