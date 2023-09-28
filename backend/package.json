@@ -4,11 +4,10 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "build-client": "cd client && npm run build ",
     "build:babel": "babel server.ts -d build-babel --extensions '.ts'",
     "build:tsc": "tsc server.ts --outDir build-tsc",
     "dev": "NODE_ENV=development nodemon --exec ts-node -r dotenv/config server.ts",
-    "prod": "npm run build-client && NODE_ENV=production ts-node -r dotenv/config server.js",
+    "prod": "NODE_ENV=production ts-node -r dotenv/config server.ts",
     "check-types": "tsc --noEmit",
     "finalize-lottery": "node -r dotenv/config scripts/finalizeLottery.mjs",
     "test": "echo \"Error: no test specified\" && exit 1",
