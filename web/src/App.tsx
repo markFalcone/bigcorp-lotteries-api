@@ -1,35 +1,58 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import { Add } from '@mui/icons-material';
+import { Box, Fab } from '@mui/material';
+import AddLotteryModal from './components/AddLotteryModal';
+import { useNewLottery } from './hooks/useNewLottery';
+import NewLotteryNotification from './components/NewLotteryNotification';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [addLotteryModalOpen, setAddLotteryModalOpen] = useState(false);
+  const { loading, error, lottery, createNewLottery, resetLottery } =
+    useNewLottery();
+
+  useEffect(() => {
+    if (lottery) {
+      setNotificationOpen(true);
+    }
+  }, [lottery]);
+
+  const handleModalClose = () => {
+    setAddLotteryModalOpen(false);
+    resetLottery();
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Box
+      sx={{
+        position: 'relative',
+        width: '100vw',
+        height: '100vh',
+      }}
+    >
+      <AddLotteryModal
+        open={addLotteryModalOpen}
+        onClose={handleModalClose}
+        loading={loading}
+        error={error}
+        createNewLottery={createNewLottery}
+      />
+      <NewLotteryNotification
+        open={notificationOpen}
+        onClose={() => setNotificationOpen(false)}
+      />
+      <Fab
+        color="primary"
+        size="large"
+        variant="extended"
+        sx={{ position: 'absolute', bottom: 32, right: 32 }}
+        onClick={() => setAddLotteryModalOpen(true)}
+      >
+        <Add sx={{ mr: 1 }} />
+        Add lottery
+      </Fab>
+    </Box>
+  );
 }
 
-export default App
+export default App;
