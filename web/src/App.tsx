@@ -42,9 +42,7 @@ function App() {
   return (
     <Box
       sx={{
-        position: 'relative',
-        width: '100vw',
-        height: '100vh',
+        minHeight: '100vh',
       }}
     >
       <LotteryList
@@ -71,7 +69,7 @@ function App() {
       />
       <Box
         sx={{
-          position: 'absolute',
+          position: 'fixed',
           bottom: 32,
           right: 32,
         }}

@@ -1,7 +1,14 @@
-import { Box, CircularProgress, Typography } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  InputAdornment,
+  TextField,
+  Typography,
+} from '@mui/material';
 import LotteryCard from './LotteryCard';
 import { Lottery } from '../types';
-import { Casino, SentimentVeryDissatisfied } from '@mui/icons-material';
+import { Casino, SentimentVeryDissatisfied, Search } from '@mui/icons-material';
+import { useState } from 'react';
 
 interface Props {
   lotteries: Array<Lottery>;
@@ -16,6 +23,12 @@ export default function LotteryList({
   onSelect,
   loading,
 }: Props) {
+  const [filter, setFilter] = useState('');
+
+  const filteredLotteries = lotteries.filter((lottery) =>
+    lottery.name.includes(filter),
+  );
+
   return (
     <Box
       sx={{
@@ -36,6 +49,19 @@ export default function LotteryList({
         Lotteries
         <Casino sx={{ ml: 4, fontSize: 60 }} />
       </Typography>
+      <TextField
+        value={filter}
+        onChange={(e) => setFilter(e.currentTarget.value)}
+        placeholder="Filter lotteries"
+        sx={{ width: 400, mb: 4 }}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <Search />
+            </InputAdornment>
+          ),
+        }}
+      />
       <Box
         sx={{
           display: 'flex',
@@ -63,7 +89,21 @@ export default function LotteryList({
             </Typography>
           </Box>
         )}
-        {lotteries.map((lottery) => (
+        {lotteries.length !== 0 && filteredLotteries.length === 0 && (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              mt: 8,
+            }}
+          >
+            <Typography variant="h4">
+              No search results for '{filter}'
+            </Typography>
+          </Box>
+        )}
+        {filteredLotteries.map((lottery) => (
           <LotteryCard
             key={lottery.id}
             lottery={lottery}
