@@ -2,6 +2,7 @@ import { Modal, Box, Typography, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { LoadingButton } from '@mui/lab';
+import { useNewLottery } from '../hooks/useNewLottery';
 
 const lotterySchema = Yup.object({
   name: Yup.string().min(4).required(),
@@ -11,21 +12,11 @@ const lotterySchema = Yup.object({
 interface Props {
   open: boolean;
   onClose: () => void;
-  createNewLottery: (lotteryData: {
-    name: string;
-    prize: string;
-  }) => Promise<void>;
-  loading: boolean;
-  error?: string;
+  onSubmit: () => void;
 }
 
-export default function AddLotteryModal({
-  open,
-  onClose,
-  createNewLottery,
-  loading,
-  error,
-}: Props) {
+export default function AddLotteryModal({ open, onClose, onSubmit }: Props) {
+  const { error, loading, createNewLottery } = useNewLottery();
   const handleClose = () => {
     formik.resetForm();
     onClose();
@@ -34,7 +25,7 @@ export default function AddLotteryModal({
   const formik = useFormik({
     validationSchema: lotterySchema,
     validateOnChange: true,
-    isInitialValid: false,
+    validateOnMount: true,
     initialValues: {
       name: '',
       prize: '',
@@ -42,6 +33,7 @@ export default function AddLotteryModal({
     onSubmit: (values) => {
       createNewLottery({ name: values.name, prize: values.prize })
         .then(() => {
+          onSubmit();
           handleClose();
         })
         .catch(() => {

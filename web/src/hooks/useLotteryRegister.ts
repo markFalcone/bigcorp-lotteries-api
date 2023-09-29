@@ -1,20 +1,27 @@
 import { useState } from 'react';
-import { Lottery } from '../types';
 import * as LotteryService from '../services/lottery';
 
-export function useNewLottery() {
-  const [lottery, setLottery] = useState<Lottery>();
+export default function useLotteryRegister() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
 
-  const createNewLottery = (lotteryData: { name: string; prize: string }) => {
-    setError(undefined);
+  const registerToLotteries = ({
+    name,
+    lotteries,
+  }: {
+    name: string;
+    lotteries: Array<string>;
+  }) => {
     setLoading(true);
+    setError(undefined);
 
-    return LotteryService.createNewLottery(lotteryData)
-      .then((lottery) => {
+    return Promise.all(
+      lotteries.map((lotteryId) =>
+        LotteryService.registerToLottery({ name, lotteryId }),
+      ),
+    )
+      .then(() => {
         setLoading(false);
-        setLottery(lottery);
       })
       .catch((e: Error) => {
         setLoading(false);
@@ -25,9 +32,8 @@ export function useNewLottery() {
   };
 
   return {
-    data: lottery,
     loading,
     error,
-    createNewLottery,
+    registerToLotteries,
   };
 }

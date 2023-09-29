@@ -1,25 +1,42 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Add } from '@mui/icons-material';
 import { Box, Fab } from '@mui/material';
+import LotteryList from './components/LotteryList';
+import useLotteries from './hooks/useLotteries';
 import AddLotteryModal from './components/AddLotteryModal';
-import { useNewLottery } from './hooks/useNewLottery';
-import NewLotteryNotification from './components/NewLotteryNotification';
+import LotteryNotification from './components/LotteryNotification';
+import RegisterModal from './components/RegisterModal';
 
 function App() {
-  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notification, setNotification] = useState({
+    open: false,
+    message: '',
+  });
   const [addLotteryModalOpen, setAddLotteryModalOpen] = useState(false);
-  const { loading, error, lottery, createNewLottery, resetLottery } =
-    useNewLottery();
+  const [registerModalOpen, setRegisterModalOpen] = useState(false);
+  const [selectedLotteries, setSelectedLotteries] = useState<Array<string>>([]);
+  const lotteries = useLotteries();
 
-  useEffect(() => {
-    if (lottery) {
-      setNotificationOpen(true);
-    }
-  }, [lottery]);
+  const handleNewLottery = () => {
+    setNotification({ open: true, message: 'New lottery created' });
+    setSelectedLotteries([]);
+    lotteries.fetchLotteries();
+  };
 
-  const handleModalClose = () => {
-    setAddLotteryModalOpen(false);
-    resetLottery();
+  const handleRegister = () => {
+    setSelectedLotteries([]);
+    setNotification({ open: true, message: 'Registered to lotteries' });
+  };
+
+  const handleSelect = (lotteryId: string) => {
+    setSelectedLotteries((lotteries) => {
+      if (lotteries.includes(lotteryId)) {
+        const index = lotteries.indexOf(lotteryId);
+        return [...lotteries.slice(0, index), ...lotteries.slice(index + 1)];
+      } else {
+        return [...lotteries, lotteryId];
+      }
+    });
   };
 
   return (
@@ -30,27 +47,54 @@ function App() {
         height: '100vh',
       }}
     >
+      <LotteryList
+        lotteries={lotteries.data}
+        selectedLotteries={selectedLotteries}
+        loading={lotteries.loading}
+        onSelect={handleSelect}
+      />
+      <RegisterModal
+        open={registerModalOpen}
+        onClose={() => setRegisterModalOpen(false)}
+        onSubmit={handleRegister}
+        selectedLotteries={selectedLotteries}
+      />
       <AddLotteryModal
         open={addLotteryModalOpen}
-        onClose={handleModalClose}
-        loading={loading}
-        error={error}
-        createNewLottery={createNewLottery}
+        onClose={() => setAddLotteryModalOpen(false)}
+        onSubmit={handleNewLottery}
       />
-      <NewLotteryNotification
-        open={notificationOpen}
-        onClose={() => setNotificationOpen(false)}
+      <LotteryNotification
+        open={notification.open}
+        message={notification.message}
+        onClose={() => setNotification({ open: false, message: '' })}
       />
-      <Fab
-        color="primary"
-        size="large"
-        variant="extended"
-        sx={{ position: 'absolute', bottom: 32, right: 32 }}
-        onClick={() => setAddLotteryModalOpen(true)}
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 32,
+          right: 32,
+        }}
       >
-        <Add sx={{ mr: 1 }} />
-        Add lottery
-      </Fab>
+        <Fab
+          size="large"
+          variant="extended"
+          disabled={selectedLotteries.length === 0}
+          onClick={() => setRegisterModalOpen(true)}
+          sx={{ mr: 2 }}
+        >
+          Register
+        </Fab>
+        <Fab
+          color="primary"
+          size="large"
+          variant="extended"
+          onClick={() => setAddLotteryModalOpen(true)}
+        >
+          <Add sx={{ mr: 1 }} />
+          Add lottery
+        </Fab>
+      </Box>
     </Box>
   );
 }
