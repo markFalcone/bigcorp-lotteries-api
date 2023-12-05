@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import FAB from '../components/Fab';
 import Loader from '../components/Loader';
@@ -8,6 +8,8 @@ import { colors } from '../colors';
 import LotteryList from '../components/LotteryList';
 import useLotteries from '../hooks/useLotteries';
 import useAsyncStorage from '../hooks/useAsyncStorage';
+import { HomeHeader } from '../components/HomeHeader';
+import { LotteriesSortingContextProvider } from '../context/lotteries-sorting-context';
 
 const Home = () => {
   const [selectedLotteries, setSelectedLotteries] = useState<Array<string>>([]);
@@ -39,28 +41,20 @@ const Home = () => {
     });
   };
 
-  const backgroundColor =
-    selectedLotteries.length === 0 ? colors.grey : colors.secondary;
-
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        accessibilityRole="button"
-        onPress={() => navigation.navigate('Register', { selectedLotteries })}
-        style={[styles.button, { backgroundColor }]}
-        disabled={selectedLotteries.length === 0}
-      >
-        <Text style={styles.text}>Register</Text>
-      </TouchableOpacity>
-      <LotteryList
-        lotteries={lotteries.data}
-        loading={lotteries.loading}
-        onPress={handleSelect}
-        selectedLotteries={selectedLotteries}
-        registeredLotteries={registeredLotteries || []}
-      />
-      <FAB onPress={() => navigation.navigate('AddLottery')} />
-    </View>
+    <LotteriesSortingContextProvider>
+      <View style={styles.container}>
+        <HomeHeader selectedLotteries={selectedLotteries} />
+        <LotteryList
+          lotteries={lotteries.data}
+          loading={lotteries.loading}
+          onPress={handleSelect}
+          selectedLotteries={selectedLotteries}
+          registeredLotteries={registeredLotteries || []}
+        />
+        <FAB onPress={() => navigation.navigate('AddLottery')} />
+      </View>
+    </LotteriesSortingContextProvider>
   );
 };
 
@@ -72,18 +66,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary,
     alignItems: 'center',
     paddingTop: 50,
-  },
-  button: {
-    position: 'absolute',
-    right: 16,
-    top: 8,
-    borderRadius: 4,
-    paddingHorizontal: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 4,
-  },
-  text: {
-    color: colors.buttonSecondary,
   },
 });
