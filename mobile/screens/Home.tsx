@@ -11,7 +11,7 @@ import useAsyncStorage from '../hooks/useAsyncStorage';
 import { HomeHeader } from '../components/HomeHeader';
 import { LotteriesSortingContextProvider } from '../context/lotteries-sorting-context';
 import { RootState } from '../store/reducers';
-import { getLotteries } from '../store/actions/lotteryActions';
+import { getLotteries } from '../store/reducers/lotteryReducer';
 
 const Home = () => {
   const [selectedLotteries, setSelectedLotteries] = useState<Array<string>>([]);

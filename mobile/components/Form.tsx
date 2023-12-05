@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   View,
@@ -13,7 +12,7 @@ import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { colors } from '../colors';
 import { RootState } from '../store/reducers';
-import { addLottery } from '../store/actions/lotteryActions';
+import { addLottery } from '../store/reducers/lotteryReducer';
 
 const lotterySchema = Yup.object({
   name: Yup.string().min(4).required(),
