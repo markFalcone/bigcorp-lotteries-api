@@ -1,27 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
 import FAB from '../components/Fab';
 import Loader from '../components/Loader';
 import { AddLotteryNavigationProp } from '../types';
 import { colors } from '../colors';
 import LotteryList from '../components/LotteryList';
-import useLotteries from '../hooks/useLotteries';
 import useAsyncStorage from '../hooks/useAsyncStorage';
 import { HomeHeader } from '../components/HomeHeader';
 import { LotteriesSortingContextProvider } from '../context/lotteries-sorting-context';
-import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../store/reducers';
+import { getLotteries } from '../store/actions/lotteryActions';
 
 const Home = () => {
   const [selectedLotteries, setSelectedLotteries] = useState<Array<string>>([]);
   const navigation = useNavigation<AddLotteryNavigationProp>();
-  const lotteries = useLotteries();
   const isFocused = useIsFocused();
+  const dispatch = useDispatch();
   const { storedData: registeredLotteries } = useAsyncStorage();
+
+  const lotteries = useSelector((state: RootState) => state.lotteries);
 
   useEffect(() => {
     if (isFocused) {
-      lotteries.fetchLotteries();
+      dispatch(getLotteries());
       setSelectedLotteries([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
