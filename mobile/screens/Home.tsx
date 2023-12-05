@@ -10,6 +10,7 @@ import useLotteries from '../hooks/useLotteries';
 import useAsyncStorage from '../hooks/useAsyncStorage';
 import { HomeHeader } from '../components/HomeHeader';
 import { LotteriesSortingContextProvider } from '../context/lotteries-sorting-context';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Home = () => {
   const [selectedLotteries, setSelectedLotteries] = useState<Array<string>>([]);
