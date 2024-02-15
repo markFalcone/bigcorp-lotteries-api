@@ -13,12 +13,14 @@ export interface LotteryState {
   data: Lottery[];
   loading: boolean;
   error: Error | null;
+  isAddingNewLotteriesEnabled: boolean;
 }
 
 const initialState: LotteryState = {
   data: [],
   loading: false,
   error: null,
+  isAddingNewLotteriesEnabled: true,
 };
 
 // Define a thunk that dispatches those action creators
@@ -50,6 +52,9 @@ const lotteriesSlice = createSlice({
         state.data = action.payload;
       }
     },
+    toggleAddingNewLotteriesEnabled(state) {
+      state.isAddingNewLotteriesEnabled = !state.isAddingNewLotteriesEnabled;
+    },
   },
   extraReducers: (builder) => {
     // Add reducers for additional action types here, and handle loading state as needed
@@ -65,7 +70,11 @@ const lotteriesSlice = createSlice({
 });
 
 // Destructure and export the plain action creators
-export const { lotteriesLoading, lotteriesReceived } = lotteriesSlice.actions;
+export const {
+  lotteriesLoading,
+  lotteriesReceived,
+  toggleAddingNewLotteriesEnabled,
+} = lotteriesSlice.actions;
 export default lotteriesSlice;
 
 // NOTE: Previous implementation
